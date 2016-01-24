@@ -1,6 +1,4 @@
 import math
-import time
-import sys
 
 
 def render_progress(max_value, width=20):
@@ -38,38 +36,15 @@ def render_borders(inner, left_char='[', right_char=']'):
     return wrapper
 
 
-@render_message('This is a test')
-@render_percent
-@render_label
-@render_borders
-def render_bar(progress, max_value, width,
+def render_bar(cells_filled, cell_count,
                empty_char='-', filled_char='=', bumper_char='>'):
-    filled = int(math.floor(progress * width / max_value))
-    remaining = width - filled
-
-    bar_parts = []
-    bar_parts.append(filled_char * filled)
-
-    if remaining:
-        bar_parts.append(bumper_char)
-        remaining = remaining - len(bumper_char)
-
-    bar_parts.append(empty_char * remaining)
-    return ''.join(bar_parts)
-
-
-if __name__ == '__main__':
-    MAX_VALUE = 10
-    WIDTH = 20
-    if len(sys.argv) > 1:
-        MAX_VALUE = int(sys.argv[1])
-
-    if len(sys.argv) > 2:
-        WIDTH = int(sys.argv[2])
-
-    progress = render_progress(MAX_VALUE, WIDTH)
-    print('')
-    for n in range(MAX_VALUE + 1):
-        sys.stdout.write('\r' + progress(n))
-        sys.stdout.flush()
-        time.sleep(1)
+    ''' Render the status bar'''
+    assert cells_filled >= 0 and cell_count >= 0, \
+        'cells_filled and cell_count must be positive values.'
+    cells_filled = min(cell_count, cells_filled)
+    cells_empty = cell_count - cells_filled
+    if cells_empty == 0:
+        bumper_char = ''
+    cells_empty = cells_empty - len(bumper_char)
+    return ''.join([cells_filled * filled_char, bumper_char,
+                    cells_empty * empty_char])
